@@ -24,7 +24,7 @@ jobs:
       - name: Package with fyne
         run: |
           mkdir -p dist
-          fyne package -os linux -release -icon Icon.png
+          fyne package -os linux -release
           mv FolederScan dist/FolederScan-linux-amd64
       - uses: actions/upload-artifact@v4
         with:
@@ -44,7 +44,7 @@ jobs:
       - name: Package with fyne
         run: |
           mkdir dist
-          fyne package -os windows -release -icon Icon.png
+          fyne package -os windows -release
           mv FolederScan.exe dist/FolederScan-windows-amd64.exe
         shell: bash
       - uses: actions/upload-artifact@v4
@@ -65,7 +65,7 @@ jobs:
       - name: Package with fyne
         run: |
           mkdir -p dist
-          fyne package -os darwin -arch arm64 -release -icon Icon.png
+          fyne package -os darwin -arch arm64 -release
           mv FolederScan.app dist/FolederScan-mac-arm64.app
       - uses: actions/upload-artifact@v4
         with:
