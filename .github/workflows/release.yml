@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build and Release GUI
 
 on:
   push:
@@ -15,9 +15,17 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.4'
-      - run: |
+      - name: Install Linux GUI dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libgl1-mesa-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+      - name: Install fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+      - name: Package with fyne
+        run: |
           mkdir -p dist
-          GOOS=linux GOARCH=amd64 go build -o dist/FolederScan-linux-amd64
+          fyne package -os linux -release -icon Icon.png
+          mv FolederScan dist/FolederScan-linux-amd64
       - uses: actions/upload-artifact@v4
         with:
           name: FolederScan-linux-amd64
@@ -31,9 +39,13 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.4'
-      - run: |
+      - name: Install fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+      - name: Package with fyne
+        run: |
           mkdir dist
-          go build -o dist/FolederScan-windows-amd64.exe
+          fyne package -os windows -release -icon Icon.png
+          mv FolederScan.exe dist/FolederScan-windows-amd64.exe
         shell: bash
       - uses: actions/upload-artifact@v4
         with:
@@ -48,13 +60,17 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.4'
-      - run: |
+      - name: Install fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+      - name: Package with fyne
+        run: |
           mkdir -p dist
-          GOARCH=arm64 go build -o dist/FolederScan-darwin-arm64
+          fyne package -os darwin -arch arm64 -release -icon Icon.png
+          mv FolederScan.app dist/FolederScan-mac-arm64.app
       - uses: actions/upload-artifact@v4
         with:
-          name: FolederScan-darwin-arm64
-          path: dist/FolederScan-darwin-arm64
+          name: FolederScan-mac-arm64
+          path: dist/FolederScan-mac-arm64.app
 
   release:
     name: Create Release
@@ -65,7 +81,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
-
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
