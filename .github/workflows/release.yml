@@ -43,7 +43,7 @@ jobs:
       - name: Package with fyne
         run: |
           mkdir -p dist
-          fyne package -os darwin -arch arm64 -release
+          fyne package -os darwin -release
           ls -l
           APPNAME=$(ls *.app | head -n1)
           mv "$APPNAME" "dist/FolederScan-mac-arm64.app"
