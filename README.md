@@ -1,4 +1,4 @@
-# FolederScan-go
+# FolderScan-go
 
 ：
 
