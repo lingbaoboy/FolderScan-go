@@ -1,0 +1,56 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+      - main  # 或您希望触发构建的其他分支
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [windows, linux, darwin]
+        arch: [amd64, arm64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.20'  # 指定Go版本
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Build
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o FolderScan-${{ matrix.os }}-${{ matrix.arch }} ./...  # 替换为您的应用程序名称和路径
+
+    - name: Run tests
+      run: go test ./...  # 运行测试
+
+    - name: Package for release
+      run: |
+        if [ "${{ matrix.os }}" == "windows" ]; then
+          fyne package -os windows -release
+        elif [ "${{ matrix.os }}" == "darwin" ]; then
+          fyne package -os darwin -release
+        elif [ "${{ matrix.os }}" == "linux" ]; then
+          fyne package -os linux -release
+        fi
+
+    - name: Upload Release Assets
+      uses: actions/upload-artifact@v2
+      with:
+        name: FolderScan
+        path: |
+          FolderScan-windows-amd64.exe  # Windows 版本
+          FolderScan-linux-amd64         # Linux 版本
+          FolderScan-darwin-arm64        # macOS arm64 版本
