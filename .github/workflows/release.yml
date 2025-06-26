@@ -46,12 +46,17 @@ jobs:
         run: |
           mkdir -p dist
           fyne package -os darwin -release
-          ls -l
           mv FolderScan.app dist/FolderScan-mac-arm64.app
+      - name: Create DMG with Applications link
+        run: |
+          mkdir -p dmg-folder
+          cp -R dist/FolderScan-mac-arm64.app dmg-folder/
+          ln -s /Applications dmg-folder/Applications
+          hdiutil create -volname "FolderScan" -srcfolder "dmg-folder" -ov -format UDZO "dist/FolderScan-mac-arm64.dmg"
       - uses: actions/upload-artifact@v4
         with:
           name: FolderScan-mac-arm64
-          path: dist/FolderScan-mac-arm64.app
+          path: dist/FolderScan-mac-arm64.dmg
 
   release:
     name: Create Release
